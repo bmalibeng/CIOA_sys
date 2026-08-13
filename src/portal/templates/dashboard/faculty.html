@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty Dashboard - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {% if faculty %}
+        <h1 class="text-3xl font-heading font-bold text-secondary mb-2">Faculty Dashboard</h1>
+        <p class="text-gray-600 mb-8">{{ faculty.get_full_name }} | {{ faculty.department }}</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Assigned Courses</p>
+                <p class="text-3xl font-bold text-primary">{{ courses|length }}</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Total Students</p>
+                <p class="text-3xl font-bold text-primary">{{ total_students }}</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Pending Grades</p>
+                <p class="text-3xl font-bold text-yellow-600">{{ pending_grades|length }}</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Programs</p>
+                <p class="text-3xl font-bold text-primary">{{ program_performance|length }}</p>
+            </div>
+        </div>
+
+        {% if program_performance %}
+        <div class="bg-white rounded-lg shadow p-6 border-t-4 border-primary mb-8">
+            <h2 class="text-2xl font-heading font-bold text-secondary mb-4">Program Performance</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Program</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Students</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Average Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for prog in program_performance %}
+                            <tr>
+                                <td class="px-6 py-4">{{ prog.name }}</td>
+                                <td class="px-6 py-4">{{ prog.student_count }}</td>
+                                <td class="px-6 py-4">
+                                    {% if prog.avg_grade %}
+                                        <span class="font-semibold text-primary">{{ prog.avg_grade|floatformat:1 }}%</span>
+                                    {% else %}
+                                        <span class="text-gray-400">N/A</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">No programs assigned.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="bg-white rounded-lg shadow p-6 border-t-4 border-primary mb-8">
+            <h2 class="text-2xl font-heading font-bold text-secondary mb-4">My Courses</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Credits</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Programs</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Active Students</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Completed</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for course in courses %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ course.course_code }}</td>
+                                <td class="px-6 py-4">{{ course.title }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ course.credits }}</td>
+                                <td class="px-6 py-4">{{ course.programs.all|join:", " }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ course.student_count }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ course.completed_count }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No courses assigned.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 border-t-4 border-primary">
+            <h2 class="text-2xl font-heading font-bold text-secondary mb-4">Pending Grades</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Grade</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Percentage</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for enrollment in pending_grades %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.student.get_full_name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.course.title }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.letter_grade|default:'-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.percentage|default:'-' }}%</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{% url 'faculty:grades' %}" class="text-primary hover:text-primaryHover font-semibold">Update Grade</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No pending grades.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <h2 class="text-2xl font-heading font-bold text-secondary mb-4">Welcome!</h2>
+            <p class="text-gray-600">Your faculty profile is being set up. Please contact the administration.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

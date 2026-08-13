@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Payment - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block extra_head %}
+<script>
+const allStudents = [
+    {% for s in students %}
+        {
+            id: "{{ s.id }}",
+            name: "{{ s.get_full_name }}",
+            studentId: "{{ s.student_id }}",
+            program: "{{ s.program.name }}",
+            totalFees: {{ s.program.total_fees|floatformat:2 }},
+            totalPaid: {{ s.get_total_paid|floatformat:2 }},
+            balanceDue: {{ s.get_balance_due|floatformat:2 }}
+        }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+];
+
+let selectedStudentId = null;
+
+function renderStudentOptions(filterText) {
+    const studentSelect = document.getElementById('id_student');
+    if (!studentSelect) return;
+
+    const query = (filterText || '').toLowerCase().trim();
+    let html = '<option value="">Select a student</option>';
+
+    const filtered = allStudents.filter(s => {
+        if (!query) return true;
+        return s.name.toLowerCase().includes(query) ||
+               s.studentId.toLowerCase().includes(query) ||
+               s.program.toLowerCase().includes(query);
+    });
+
+    filtered.forEach(s => {
+        html += `<option value="${s.id}" data-name="${s.name.toLowerCase()}" data-student-id="${s.studentId.toLowerCase()}">${s.name} (${s.studentId}) - ${s.program}</option>`;
+    });
+
+    studentSelect.innerHTML = html;
+    selectedStudentId = null;
+}
+
+function getProgramFee() {
+    const programSelect = document.getElementById('id_program');
+    const feeDisplay = document.getElementById('program_fee');
+    if (programSelect && feeDisplay) {
+        const selectedOption = programSelect.options[programSelect.selectedIndex];
+        const fee = selectedOption.getAttribute('data-fee') || '0.00';
+        feeDisplay.textContent = 'M ' + parseFloat(fee).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        calculateBalance();
+    }
+}
+
+function getStudentBalance() {
+    const studentSelect = document.getElementById('id_student');
+    const studentId = studentSelect.value;
+    if (!studentId) {
+        document.getElementById('total_fees').textContent = 'M 0.00';
+        document.getElementById('total_paid').textContent = 'M 0.00';
+        document.getElementById('balance_due').textContent = 'M 0.00';
+        selectedStudentId = null;
+        calculateBalance();
+        return;
+    }
+
+    const student = allStudents.find(s => s.id === studentId);
+    if (student) {
+        document.getElementById('total_fees').textContent = 'M ' + student.totalFees.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('total_paid').textContent = 'M ' + student.totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('balance_due').textContent = 'M ' + student.balanceDue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        selectedStudentId = studentId;
+    }
+    calculateBalance();
+}
+
+function calculateBalance() {
+    const amountInput = document.getElementById('id_amount');
+    const newBalanceDisplay = document.getElementById('new_balance');
+    const balanceDueElement = document.getElementById('balance_due');
+
+    if (amountInput && newBalanceDisplay && balanceDueElement) {
+        const currentBalance = parseFloat(balanceDueElement.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+        const paymentAmount = parseFloat(amountInput.value) || 0;
+        const newBalance = Math.max(0, currentBalance - paymentAmount);
+        newBalanceDisplay.textContent = 'M ' + newBalance.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const studentSelect = document.getElementById('id_student');
+    const programSelect = document.getElementById('id_program');
+    const amountInput = document.getElementById('id_amount');
+    const studentSearch = document.getElementById('student_search');
+
+    if (studentSelect) {
+        studentSelect.addEventListener('change', getStudentBalance);
+    }
+    if (programSelect) {
+        programSelect.addEventListener('change', getProgramFee);
+    }
+    if (amountInput) {
+        amountInput.addEventListener('input', calculateBalance);
+    }
+
+    if (studentSearch) {
+        studentSearch.addEventListener('input', function() {
+            renderStudentOptions(this.value);
+        });
+    }
+
+    renderStudentOptions('');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Grade Monitoring - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-heading font-bold text-secondary mb-8">Grade Monitoring</h1>
+
+    <div class="bg-white rounded-lg shadow p-6 border-t-4 border-primary mb-8">
+        <h2 class="text-xl font-heading font-bold text-secondary mb-4">Program Average Grades</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Program</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Average Grade (%)</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for prog in program_avg %}
+                        <tr>
+                            <td class="px-6 py-4">{{ prog.name }}</td>
+                            <td class="px-6 py-4">
+                                {% if prog.avg_grade %}
+                                    <span class="font-semibold">{{ prog.avg_grade|floatformat:1 }}%</span>
+                                {% else %}
+                                    <span class="text-gray-400">No grades yet</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">No programs found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6 border-t-4 border-primary">
+        <h2 class="text-xl font-heading font-bold text-secondary mb-4">Student Grades Overview</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Program</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Completed</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Average %</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in student_grades %}
+                        <tr>
+                            <td class="px-6 py-4">{{ item.student.get_full_name }}</td>
+                            <td class="px-6 py-4">{{ item.student.program.name }}</td>
+                            <td class="px-6 py-4">{{ item.completed_count }}</td>
+                            <td class="px-6 py-4">
+                                {% if item.avg_percentage %}
+                                    <span class="font-semibold">{{ item.avg_percentage|floatformat:1 }}%</span>
+                                {% else %}
+                                    <span class="text-gray-400">N/A</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">No students found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

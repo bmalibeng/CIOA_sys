@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow p-8 border-t-4 border-primary">
+        <h1 class="text-3xl font-heading font-bold text-secondary mb-6">My Profile</h1>
+        <div class="space-y-4">
+            <div class="border-b border-gray-200 pb-4">
+                <p class="text-sm text-gray-500">Name</p>
+                <p class="text-lg font-semibold">{{ user.get_full_name }}</p>
+            </div>
+            <div class="border-b border-gray-200 pb-4">
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="text-lg">{{ user.email }}</p>
+            </div>
+            <div class="border-b border-gray-200 pb-4">
+                <p class="text-sm text-gray-500">Phone</p>
+                <p class="text-lg">{{ user.phone|default:'Not provided' }}</p>
+            </div>
+            <div class="border-b border-gray-200 pb-4">
+                <p class="text-sm text-gray-500">Account Type</p>
+                <p class="text-lg">{{ user.get_user_type_display }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

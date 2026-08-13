@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow p-8 border-t-4 border-primary">
+        <h1 class="text-3xl font-heading font-bold text-secondary mb-6">Reports</h1>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-primary">
+                <h3 class="text-lg font-heading font-bold text-secondary mb-2">Total Students</h3>
+                <p class="text-3xl font-bold text-primary">{{ total_students }}</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-primary">
+                <h3 class="text-lg font-heading font-bold text-secondary mb-2">Programs</h3>
+                <p class="text-3xl font-bold text-primary">{{ total_programs }}</p>
+            </div>
+            <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-primary">
+                <h3 class="text-lg font-heading font-bold text-secondary mb-2">Faculty</h3>
+                <p class="text-3xl font-bold text-primary">{{ total_faculty }}</p>
+            </div>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-primary">
+            <h3 class="text-lg font-heading font-bold text-secondary mb-2">Total Revenue</h3>
+            <p class="text-3xl font-bold text-green-600">M {{ total_revenue|floatformat:2 }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

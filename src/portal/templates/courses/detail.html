@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Course Detail - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-lg shadow p-8 border-t-4 border-primary">
+        <h1 class="text-3xl font-heading font-bold text-secondary mb-2">{{ course.course_code }}</h1>
+        <p class="text-xl text-gray-600 mb-4">{{ course.title }}</p>
+        <p class="text-gray-700 mb-6">{{ course.description }}</p>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-4 rounded">
+                <p class="text-sm text-gray-500">Credits</p>
+                <p class="text-2xl font-bold text-primary">{{ course.credits }}</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded">
+                <p class="text-sm text-gray-500">Programs</p>
+                <p class="text-2xl font-bold text-primary">{{ course.programs.all|length }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

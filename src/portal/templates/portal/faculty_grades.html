@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Grade Entry - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-heading font-bold text-secondary mb-8">Grade Entry</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-4 rounded {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow p-6 border-t-4 border-primary">
+        <h2 class="text-xl font-heading font-bold text-secondary mb-4">Pending Grades</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Grade</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Percentage</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Update Grade</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for enrollment in enrollments %}
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.student.get_full_name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.course.title }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.letter_grade|default:'-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.percentage|default:'-' }}%</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <form method="post" class="flex gap-2 items-center">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="enrollment_id" value="{{ enrollment.id }}">
+                                    <input type="text" name="letter_grade" placeholder="Grade (A-F)" value="{{ enrollment.letter_grade|default:'' }}"
+                                        class="w-20 px-2 py-1 border border-gray-300 rounded text-sm">
+                                    <input type="number" name="percentage" placeholder="%" value="{{ enrollment.percentage|default:'' }}"
+                                        class="w-16 px-2 py-1 border border-gray-300 rounded text-sm" step="0.01" min="0" max="100">
+                                    <button type="submit" class="bg-primary hover:bg-primaryHover text-white px-3 py-1 rounded text-sm transition">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No pending grades.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

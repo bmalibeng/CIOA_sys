@@ -1,0 +1,16 @@
+{
+  "name": "cioa-portal",
+  "version": "1.0.0",
+  "description": "COGRABIG INSTITUTE OF ARTS - Student Management Portal",
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/css/style.css -o ./static/css/output.css --watch",
+    "build:css:prod": "tailwindcss -i ./static/css/style.css -o ./static/css/output.css --minify",
+    "dev": "python manage.py runserver"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "@tailwindcss/forms": "^0.5.6"
+  }
+}

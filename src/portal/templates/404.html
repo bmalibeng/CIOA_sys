@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <div class="text-center">
+        <h1 class="text-9xl font-heading font-bold text-primary">404</h1>
+        <p class="text-2xl text-gray-600 mb-8">Page Not Found</p>
+        <a href="{% url 'landing' %}" class="bg-primary hover:bg-primaryHover text-white px-6 py-3 rounded-md transition">Go Home</a>
+    </div>
+</div>
+{% endblock %}

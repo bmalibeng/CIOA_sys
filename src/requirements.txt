@@ -1,0 +1,8 @@
+Django==4.2.7
+mysqlclient==2.2.0
+openpyxl==3.1.2
+python-decouple==3.8
+gunicorn==21.2.0
+whitenoise==6.6.0
+django-hijack==3.4.1
+django-import-export==3.3.5

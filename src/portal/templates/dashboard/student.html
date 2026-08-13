@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - COGRABIG INSTITUTE OF ARTS{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    {% if student %}
+        <h1 class="text-3xl font-heading font-bold text-secondary mb-2">Welcome, {{ student.first_name }}</h1>
+        <p class="text-gray-600 mb-8">{{ student.program.name }} | {{ student.cohort.name }}</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Remaining Months</p>
+                <p class="text-3xl font-bold text-primary">{{ remaining_months }}</p>
+                <p class="text-xs text-gray-400 mt-1">until graduation</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Progress</p>
+                <p class="text-3xl font-bold text-primary">{{ progress_percentage }}%</p>
+                <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                    <div class="bg-primary h-2 rounded-full" style="width: {{ progress_percentage }}%"></div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Total Paid</p>
+                <p class="text-2xl font-bold text-green-600">M {{ total_paid|floatformat:2 }}</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 border-l-4 border-primary">
+                <p class="text-gray-500 text-sm mb-1">Balance Due</p>
+                <p class="text-2xl font-bold text-red-600">M {{ balance_due|floatformat:2 }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mb-8 border-t-4 border-primary">
+            <h2 class="text-2xl font-heading font-bold text-secondary mb-4">My Courses</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Course</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for enrollment in enrollments %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.course.title }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                        {% if enrollment.status == 'COMPLETED' %}bg-green-100 text-green-800
+                                        {% elif enrollment.status == 'IN_PROGRESS' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ enrollment.get_status_display }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ enrollment.letter_grade|default:'-' }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">No courses enrolled yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 border-t-4 border-primary">
+            <h2 class="text-2xl font-heading font-bold text-secondary mb-4">Recent Payments</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for payment in payments %}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">{{ payment.payment_date }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-semibold">M {{ payment.amount|floatformat:2 }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                        {% if payment.status == 'VERIFIED' %}bg-green-100 text-green-800
+                                        {% elif payment.status == 'PENDING' %}bg-yellow-100 text-yellow-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ payment.get_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">No payments yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <h2 class="text-2xl font-heading font-bold text-secondary mb-4">Welcome!</h2>
+            <p class="text-gray-600">Your student profile is being set up. Please contact the administration.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

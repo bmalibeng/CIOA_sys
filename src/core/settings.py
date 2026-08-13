@@ -62,7 +62,7 @@ ASGI_APPLICATION = 'core.asgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'mysql.connector.django',
         'NAME': os.environ.get('DB_NAME', 'cioa_portal'),
         'USER': os.environ.get('DB_USER', 'root'),
         'PASSWORD': os.environ.get('DB_PASSWORD', ''),

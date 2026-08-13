@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
 
 {% block title %}COGRABIG INSTITUTE OF ARTS - Excellence in Creative Arts Education{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="relative bg-primary text-white overflow-hidden flex items-center min-h-[70vh]">
+<section class="relative hero-bg text-white overflow-hidden flex items-center min-h-[70vh]">
     <div class="absolute inset-0 bg-black opacity-10"></div>
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <div class="max-w-3xl mx-auto text-center">

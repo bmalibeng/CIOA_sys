@@ -61,6 +61,7 @@ class Student(models.Model):
         ('WITHDRAWN', 'Withdrawn'),
     )
 
+    user = models.OneToOneField('core.User', on_delete=models.CASCADE, related_name='student_profile', null=True, blank=True)
     student_id = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)

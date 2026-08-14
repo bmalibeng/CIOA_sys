@@ -1,17 +1,21 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 
-{% block title %}Import Excel - COGRABIG INSTITUTE OF ARTS{% endblock %}
+{% block title %}Import Excel{% endblock %}
 
-{% block content %}
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-white rounded-lg shadow p-8 border-t-4 border-primary">
-        <h1 class="text-3xl font-heading font-bold text-secondary mb-6">Import Excel Data</h1>
+{% block admin_content %}
+<div class="max-w-3xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-2xl font-heading font-bold text-secondary">Import Excel Data</h1>
+        <p class="text-sm text-gray-500 mt-1">Bulk import data from Excel files</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <form method="post" enctype="multipart/form-data" class="space-y-6">
             {% csrf_token %}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Excel File</label>
                 <input type="file" name="excel_file" accept=".xlsx,.xls" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                 <p class="text-sm text-gray-500 mt-1">Supported sheets: Programs, Cohorts, Students, Courses, Enrollments, Payments</p>
             </div>
             <div class="flex items-center">
@@ -22,9 +26,14 @@
                 <input type="checkbox" name="update_existing" id="update_existing" class="mr-2">
                 <label for="update_existing" class="text-sm text-gray-700">Update existing records</label>
             </div>
-            <button type="submit" class="w-full bg-primary hover:bg-primaryHover text-white font-semibold py-3 px-4 rounded-md transition">
-                Import Data
-            </button>
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-primary hover:bg-primaryDark text-white font-semibold py-3 px-4 rounded-lg transition shadow-sm">
+                    Import Data
+                </button>
+                <a href="{% url 'portal:admin_dashboard' %}" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                    Cancel
+                </a>
+            </div>
         </form>
     </div>
 </div>

@@ -1,70 +1,130 @@
-{% extends 'base.html' %}
+{% extends 'dashboard/admin_base.html' %}
 
-{% block title %}{% if user.id %}Edit User{% else %}Add User{% endif %} - COGRABIG INSTITUTE OF ARTS{% endblock %}
+{% block title %}{% if form_user %}Edit User{% else %}Add User{% endif %}{% endblock %}
 
-{% block content %}
-<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-white rounded-lg shadow p-8 border-t-4 border-primary">
-        <h1 class="text-3xl font-heading font-bold text-secondary mb-6">{% if user.id %}Edit User{% else %}Add New User{% endif %}</h1>
+{% block extra_head %}
+<script>
+function toggleRoleFields() {
+    const role = document.getElementById('id_user_type').value;
+    const studentFields = document.getElementById('student-fields');
+    const facultyFields = document.getElementById('faculty-fields');
+    if (studentFields) studentFields.style.display = role === 'STUDENT' ? 'block' : 'none';
+    if (facultyFields) facultyFields.style.display = role === 'FACULTY' ? 'block' : 'none';
+}
+document.addEventListener('DOMContentLoaded', toggleRoleFields);
+</script>
+{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-2xl font-heading font-bold text-secondary">{% if form_user %}Edit User{% else %}Add New User{% endif %}</h1>
+        <p class="text-sm text-gray-500 mt-1">{% if form_user %}Update user information{% else %}Create a new system user{% endif %}</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
         <form method="post" class="space-y-6">
             {% csrf_token %}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                <input type="email" name="email" value="{{ user.email|default:'' }}" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <input type="email" name="email" value="{{ form_user.email|default:'' }}" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                <input type="text" name="first_name" value="{{ user.first_name|default:'' }}"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <input type="text" name="first_name" value="{{ form_user.first_name|default:'' }}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                <input type="text" name="last_name" value="{{ user.last_name|default:'' }}"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <input type="text" name="last_name" value="{{ form_user.last_name|default:'' }}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input type="text" name="phone" value="{{ user.phone|default:'' }}"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <input type="text" name="phone" value="{{ form_user.phone|default:'' }}"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
-                <select name="user_type" required
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <select name="user_type" id="id_user_type" required onchange="toggleRoleFields()"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                     <option value="">Select role</option>
-                    <option value="ADMIN" {% if user.user_type == 'ADMIN' %}selected{% endif %}>Admin</option>
-                    <option value="FACULTY" {% if user.user_type == 'FACULTY' %}selected{% endif %}>Faculty</option>
-                    <option value="STUDENT" {% if user.user_type == 'STUDENT' %}selected{% endif %}>Student</option>
+                    <option value="ADMIN" {% if form_user and form_user.user_type == 'ADMIN' %}selected{% endif %}>Admin</option>
+                    <option value="FACULTY" {% if form_user and form_user.user_type == 'FACULTY' %}selected{% endif %}>Faculty</option>
+                    <option value="STUDENT" {% if form_user and form_user.user_type == 'STUDENT' %}selected{% endif %}>Student</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Password {% if user.id %}(leave blank to keep current){% endif %} *</label>
-                <input type="password" name="password" {% if not user.id %}required{% endif %}
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password {% if form_user %}(leave blank to keep current){% endif %} *</label>
+                <input type="password" name="password" {% if not form_user %}required{% endif %}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
             </div>
 
-            {% if faculty_profile %}
-                <div class="border-t border-gray-200 pt-4">
-                    <h3 class="text-lg font-heading font-bold text-secondary mb-4">Faculty Details</h3>
+            <div id="student-fields" class="border-t border-gray-200 pt-4 space-y-4">
+                <h3 class="text-lg font-heading font-bold text-secondary">Student Details</h3>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Student ID *</label>
+                    <input type="text" name="student_id" value="{% if student_profile %}{{ student_profile.student_id|default:'' }}{% endif %}"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Faculty ID</label>
-                        <input type="text" name="faculty_id" value="{{ faculty_profile.faculty_id|default:'' }}"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Program *</label>
+                        <select name="program" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <option value="">Select program</option>
+                            {% for p in programs %}
+                                <option value="{{ p.id }}" {% if student_profile and student_profile.program_id == p.id %}selected{% endif %}>{{ p.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                        <input type="text" name="department" value="{{ faculty_profile.department|default:'' }}"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cohort *</label>
+                        <select name="cohort" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <option value="">Select cohort</option>
+                            {% for c in cohorts %}
+                                <option value="{{ c.id }}" {% if student_profile and student_profile.cohort_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
-            {% endif %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Enrollment Date *</label>
+                        <input type="date" name="enrollment_date" value="{% if student_profile %}{{ student_profile.enrollment_date|default:'' }}{% endif %}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Expected Graduation *</label>
+                        <input type="date" name="expected_graduation_date" value="{% if student_profile %}{{ student_profile.expected_graduation_date|default:'' }}{% endif %}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+            </div>
 
-            <div class="flex gap-4">
-                <button type="submit" class="bg-primary hover:bg-primaryHover text-white font-semibold py-3 px-4 rounded-md transition">
-                    {% if user.id %}Update User{% else %}Create User{% endif %}
+            <div id="faculty-fields" class="border-t border-gray-200 pt-4">
+                <h3 class="text-lg font-heading font-bold text-secondary mb-4">Faculty Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Faculty ID *</label>
+                        <input type="text" name="faculty_id" value="{% if faculty_profile %}{{ faculty_profile.faculty_id|default:'' }}{% endif %}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Department *</label>
+                        <input type="text" name="department" value="{% if faculty_profile %}{{ faculty_profile.department|default:'' }}{% endif %}"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <button type="submit" class="flex-1 bg-primary hover:bg-primaryDark text-white font-semibold py-3 px-4 rounded-lg transition shadow-sm">
+                    {% if form_user %}Update User{% else %}Create User{% endif %}
                 </button>
-                <a href="{% url 'portal:manage_users' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-md transition">Cancel</a>
+                <a href="{% url 'portal:manage_users' %}" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">
+                    Cancel
+                </a>
             </div>
         </form>
     </div>

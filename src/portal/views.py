@@ -6,7 +6,7 @@ from datetime import timedelta, date
 from django.http import HttpResponse, JsonResponse
 from students.models import Student, Program, Cohort, Payment, Enrollment, Course
 from faculty.models import Faculty
-from core.models import User
+from core.models import User, SiteSettings
 from decimal import Decimal
 from portal.utils.pdf_receipt import generate_payment_receipt
 
@@ -26,7 +26,11 @@ def is_student(user):
 def landing_page(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
-    return render(request, 'landing.html')
+    settings = SiteSettings.get_solo()
+    context = {
+        'hero_bg_image': settings.hero_background.url if settings.hero_background else None,
+    }
+    return render(request, 'landing.html', context)
 
 
 @login_required
@@ -109,6 +113,9 @@ def manage_users(request):
 def add_user(request):
     from django.contrib import messages
     from django.shortcuts import redirect
+    from students.models import Student, Program, Cohort
+    programs = Program.objects.filter(is_active=True)
+    cohorts = Cohort.objects.filter(is_active=True)
     if request.method == 'POST':
         email = request.POST.get('email')
         user_type = request.POST.get('user_type')
@@ -134,10 +141,33 @@ def add_user(request):
                         faculty_id=faculty_id,
                         department=department,
                     )
+            elif user_type == 'STUDENT':
+                student_id = request.POST.get('student_id', '')
+                program_id = request.POST.get('program')
+                cohort_id = request.POST.get('cohort')
+                enrollment_date = request.POST.get('enrollment_date')
+                expected_graduation_date = request.POST.get('expected_graduation_date')
+                if student_id and program_id and cohort_id and enrollment_date and expected_graduation_date:
+                    Student.objects.create(
+                        user=user,
+                        student_id=student_id,
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email,
+                        phone=phone,
+                        program_id=program_id,
+                        cohort_id=cohort_id,
+                        enrollment_date=enrollment_date,
+                        expected_graduation_date=expected_graduation_date,
+                    )
             messages.success(request, f'User {email} created successfully.')
             return redirect('portal:manage_users')
         messages.error(request, 'Please fill all required fields.')
-    return render(request, 'admin_pages/user_form.html')
+    return render(request, 'admin_pages/user_form.html', {
+        'form_user': None,
+        'programs': programs,
+        'cohorts': cohorts,
+    })
 
 
 @login_required
@@ -145,7 +175,12 @@ def add_user(request):
 def edit_user(request, user_id):
     from django.contrib import messages
     from django.shortcuts import redirect
+    from students.models import Student, Program, Cohort
     user = get_object_or_404(User, id=user_id)
+    programs = Program.objects.filter(is_active=True)
+    cohorts = Cohort.objects.filter(is_active=True)
+    student_profile = getattr(user, 'student_profile', None)
+    faculty_profile = getattr(user, 'faculty_profile', None)
     if request.method == 'POST':
         user.email = request.POST.get('email', user.email)
         user.user_type = request.POST.get('user_type', user.user_type)
@@ -156,7 +191,42 @@ def edit_user(request, user_id):
         if password:
             user.set_password(password)
         user.save()
-        if user.user_type == 'FACULTY':
+
+        if user.user_type == 'STUDENT':
+            student_id = request.POST.get('student_id', '')
+            program_id = request.POST.get('program')
+            cohort_id = request.POST.get('cohort')
+            enrollment_date = request.POST.get('enrollment_date')
+            expected_graduation_date = request.POST.get('expected_graduation_date')
+            if student_profile:
+                student_profile.student_id = student_id or student_profile.student_id
+                student_profile.first_name = user.first_name
+                student_profile.last_name = user.last_name
+                student_profile.email = user.email
+                student_profile.phone = user.phone
+                if program_id:
+                    student_profile.program_id = program_id
+                if cohort_id:
+                    student_profile.cohort_id = cohort_id
+                if enrollment_date:
+                    student_profile.enrollment_date = enrollment_date
+                if expected_graduation_date:
+                    student_profile.expected_graduation_date = expected_graduation_date
+                student_profile.save()
+            elif student_id and program_id and cohort_id and enrollment_date and expected_graduation_date:
+                Student.objects.create(
+                    user=user,
+                    student_id=student_id,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email,
+                    phone=user.phone,
+                    program_id=program_id,
+                    cohort_id=cohort_id,
+                    enrollment_date=enrollment_date,
+                    expected_graduation_date=expected_graduation_date,
+                )
+        elif user.user_type == 'FACULTY':
             try:
                 faculty = user.faculty_profile
                 faculty.faculty_id = request.POST.get('faculty_id', faculty.faculty_id)
@@ -169,12 +239,14 @@ def edit_user(request, user_id):
                     Faculty.objects.create(user=user, faculty_id=faculty_id, department=department)
         messages.success(request, f'User {user.email} updated successfully.')
         return redirect('portal:manage_users')
-    context = {
-        'user': user,
+    return render(request, 'admin_pages/user_form.html', {
+        'form_user': user,
         'is_faculty': user.user_type == 'FACULTY',
-        'faculty_profile': getattr(user, 'faculty_profile', None),
-    }
-    return render(request, 'admin_pages/user_form.html', context)
+        'faculty_profile': faculty_profile,
+        'student_profile': student_profile,
+        'programs': programs,
+        'cohorts': cohorts,
+    })
 
 
 @login_required

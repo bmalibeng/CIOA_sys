@@ -3,6 +3,28 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 
+
+class SiteSettings(models.Model):
+    hero_background = models.ImageField(
+        upload_to='site/',
+        blank=True,
+        null=True,
+        help_text="Upload a background image for the landing page hero section."
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Site Settings')
+        verbose_name_plural = _('Site Settings')
+
+    def __str__(self):
+        return "Site Settings"
+
+    @classmethod
+    def get_solo(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:

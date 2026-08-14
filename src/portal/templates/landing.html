@@ -3,6 +3,13 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% if hero_bg_image %}
+<style>
+.hero-bg {
+    background-image: url('{{ hero_bg_image }}');
+}
+</style>
+{% endif %}
 {% endblock %}
 
 {% block title %}COGRABIG INSTITUTE OF ARTS - Excellence in Creative Arts Education{% endblock %}
